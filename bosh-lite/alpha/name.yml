@@ -1,0 +1,4 @@
+---
+name: bosh-lite-alpha-cf
+meta:
+  vault_prefix: secret/bosh-lite/alpha/cf

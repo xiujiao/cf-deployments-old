@@ -1,0 +1,1205 @@
+compilation:
+  cloud_properties: {}
+  network: cf
+  reuse_compilation_vms: true
+  workers: 6
+director_uuid: 6082540d-0a64-41b3-9bea-9fa9dc8f3bab
+disk_pools:
+- cloud_properties: {}
+  disk_size: 1024
+  name: small
+- cloud_properties: {}
+  disk_size: 4096
+  name: medium
+- cloud_properties: {}
+  disk_size: 10240
+  name: large
+- cloud_properties: {}
+  disk_size: 102400
+  name: xlarge
+jobs:
+- instances: 1
+  lifecycle: errand
+  name: acceptance_tests
+  networks:
+  - name: cf
+  resource_pool: warden
+  templates:
+  - name: acceptance-tests
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+- instances: 1
+  lifecycle: errand
+  name: smoke_tests
+  networks:
+  - name: cf
+  resource_pool: warden
+  templates:
+  - name: smoke-tests
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+- instances: 1
+  name: consul_z1
+  networks:
+  - name: cf
+    static_ips:
+    - 10.244.0.54
+  persistent_disk_pool: small
+  properties:
+    consul:
+      agent:
+        mode: server
+    metron_agent:
+      zone: z1
+  resource_pool: warden
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: metron_agent
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+  update:
+    max_in_flight: 1
+    serial: true
+- instances: 1
+  name: ha_proxy_z1
+  networks:
+  - name: cf
+    static_ips:
+    - 10.244.0.34
+  properties:
+    ha_proxy:
+      ssl_pem: |
+        -----BEGIN CERTIFICATE-----
+        MIICsjCCAZoCCQC+xvE/1ZQgFzANBgkqhkiG9w0BAQUFADAaMRgwFgYDVQQDFA8q
+        LmJvc2gtbGl0ZS5jb20wIBcNMTUxMDA4MjIwNDQ3WhgPMjI4OTA3MjIyMjA0NDda
+        MBoxGDAWBgNVBAMUDyouYm9zaC1saXRlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQAD
+        ggEPADCCAQoCggEBAK09Q520xrKx75uew3mAS+y4uyRPZPEjt/pYdBl40PXIwaqO
+        X7LGoc9lNZS/eAPX6xeVFmZbLZReQ5+Fm0moeLzsh58W9jjkWWk7oGISmxfoQz9B
+        X9Eh0NHCrtKXMrCPlr+2RI/qLinJDqn87UEZqwX+84JU8hBZ8RD8D7YnfuDteySV
+        SYOEUjkiN/pIWmbJQY1sjEyk1zH1Hiy8kmnait2sX8Td2S/aV6EJBgODOstzEtnf
+        HFDIfoTJxbSK/0TbF6qBaSl0CLaOop9FX2ULEZUgAuIW4dG2k/xnpMLdz7A0ZsSU
+        Haw9okZ5wNuYk1RSqhnqw+9KUWgXwV6RlMvtXMkCAwEAATANBgkqhkiG9w0BAQUF
+        AAOCAQEAShOqAFLIc93yIjhcnN7L4ZXFo+CvOgklJqFeBbwRshsEptbaddDJYmRr
+        ZXzOE7MiTOBM8YzKqtHvl/ZguXmIAXSZlnq6kuJHdPtcZOqu1x2GAvWWOzn9Xl4m
+        T3RmwF3NgiX0jgNMkkm8i8jfT7uN9BnHxMv65b9yKeM0sRFN5XigA43DDQnfF3j4
+        FQ9jwpmS7zOx2wn6FayOgoE4rgJfV/9637ZprQOMfUbZPKgQQplDn6bvK13rj9g9
+        zCC9W0fy29l7VDuAOOSI5xzsoYyH6DfX7oySxn291hidSCb/buadNG4dgI4keMGw
+        u5K8QQYmlSY91IJtuRRITYXGmIiPpg==
+        -----END CERTIFICATE-----
+        -----BEGIN RSA PRIVATE KEY-----
+        MIIEogIBAAKCAQEArT1DnbTGsrHvm57DeYBL7Li7JE9k8SO3+lh0GXjQ9cjBqo5f
+        ssahz2U1lL94A9frF5UWZlstlF5Dn4WbSah4vOyHnxb2OORZaTugYhKbF+hDP0Ff
+        0SHQ0cKu0pcysI+Wv7ZEj+ouKckOqfztQRmrBf7zglTyEFnxEPwPtid+4O17JJVJ
+        g4RSOSI3+khaZslBjWyMTKTXMfUeLLySadqK3axfxN3ZL9pXoQkGA4M6y3MS2d8c
+        UMh+hMnFtIr/RNsXqoFpKXQIto6in0VfZQsRlSAC4hbh0baT/Gekwt3PsDRmxJQd
+        rD2iRnnA25iTVFKqGerD70pRaBfBXpGUy+1cyQIDAQABAoIBACXzdt2UnbbF3jzU
+        QfRbE8bvDSg+MFnXPlWcjQqLehNuAGcxu2s5snbxsBQ/Abat1XWcFoUj0k9feyb2
+        KPew7YpNssQ6ToRWGfRAuLjjZJCPNDQmSSxSYSGiqZO+xb8CJb8n2ctBPQ2wWwMI
+        Qp1xVxMAMC5MF59XZMUYwwRfkJ8LawB90+S9BjHcU3GqoPECLFkgEeIj3mrnmpAD
+        vhIeYvQj2W5JCpxLUA+7lnyoqnx8OTOXvBPAsKwO1Hx88yCitnxXro7i0ZAw4ErH
+        zrnMgWkFDvRiS3ta/QS2RcBBiZHKX/gRRT/AvqJ+Erveu0BcZ9AVy1UpPB0w9rBK
+        PTxS2BECgYEA3MLd6Og+xQpw4UNhy9EjeDE/b/rZK4w/vfD3WE5J3Nm4HGdSA6Q4
+        YmQYVg+VuCLR+HHsk58LxEf+cU0MNgDJR1/rFZRmociF+G0i7/7DuhFm891wWWGW
+        Iz7XeGWHi+LIeYWkteuflrkmvy/7xqArgcNqnirGhba6706MZz0G0YUCgYEAyOR5
+        aF7qRpLXHgMOPOzJKC4ceWA5rY8rcdJZFI7aNq5MJF9o+fNNt8YRJ1hQTzs5K/R+
+        HwBJel8J6CoPQo9WUXnj0md4M67sCZSBqWANMO/J0f4VkbLS/lwch+ZPS8jt3Z4z
+        umYW4QnloIKXxORfySo7r9DzZSgmxuDE8PVWn3UCgYAFTwpXF36q7l1YjW5EoHrh
+        4Q1NfBLM4UqHHsxT604LaZDr3fAy9jgE5bNQHn/TNcMm3lZ6FlEKH1EXGGs6wToV
+        5VCZ7D+rlE7kcntsmgvK5bA8HQ8elyItJs23r3la+9EmWvhjB4+G6FzuLBE57ZAe
+        RrzBoPW1MXe9WX423VjUoQKBgGea5T49jSc+fbDdtI8ZMxkExuyWAskOyEIYUJa4
+        obOHqn8rsZEOuKspfBlFg42JJpATtKO6WyrALvTMFDiogcTdTvBpKmXFNbgvHbvD
+        bKorUHN7TZZpmkVSLeisj4KvKnWcLGNaWTxQBVwFXc5OVVQC8utWoOAvl+gDba4z
+        aSwtAoGANdquHRNbigPj2y0cRoexYJwKgpfGEK4HXitsKZUUg09gVfagM1HynVFz
+        RA0LVac0oJZFdMYZyU/PXCySS237xUD2/0oySYJIK9E0C4ZxKD+DoAk5Z097z0LM
+        7rxStMCBWB2x4ommvEnpdgntEKkl4buIDatvmbdmdwkY3+X65Ks=
+        -----END RSA PRIVATE KEY-----
+    metron_agent:
+      zone: z1
+    router:
+      servers:
+      - 10.244.0.22
+  resource_pool: warden
+  templates:
+  - name: haproxy
+    release: cf
+  - name: metron_agent
+    release: cf
+  - name: consul_agent
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+  update: {}
+- instances: 1
+  name: nats_z1
+  networks:
+  - name: cf
+    static_ips:
+    - 10.244.0.6
+  properties:
+    metron_agent:
+      zone: z1
+  resource_pool: warden
+  templates:
+  - name: nats
+    release: cf
+  - name: nats_stream_forwarder
+    release: cf
+  - name: metron_agent
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+  update: {}
+- instances: 1
+  name: etcd_z1
+  networks:
+  - name: cf
+    static_ips:
+    - 10.244.0.42
+  persistent_disk_pool: large
+  properties:
+    metron_agent:
+      zone: z1
+  resource_pool: warden
+  templates:
+  - name: etcd
+    release: cf
+  - name: etcd_metrics_server
+    release: cf
+  - name: metron_agent
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+  update:
+    max_in_flight: 1
+    serial: true
+- instances: 1
+  name: blobstore_z1
+  networks:
+  - name: cf
+  persistent_disk_pool: xlarge
+  properties:
+    consul:
+      agent:
+        services:
+          blobstore: {}
+    metron_agent:
+      zone: z1
+    route_registrar:
+      routes:
+      - name: blobstore
+        port: 80
+        registration_interval: 20s
+        tags:
+          component: blobstore
+        uris:
+        - blobstore.system.10.4.1.80.xip.io
+  resource_pool: warden
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: metron_agent
+    release: cf
+  - name: blobstore
+    release: cf
+  - name: route_registrar
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+  update: {}
+- instances: 1
+  name: postgres_z1
+  networks:
+  - name: cf
+    static_ips:
+    - 10.244.0.30
+  persistent_disk_pool: medium
+  properties:
+    metron_agent:
+      zone: z1
+  resource_pool: warden
+  templates:
+  - name: postgres
+    release: postgres
+  - name: metron_agent
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+  update: {}
+- instances: 1
+  name: uaa_z1
+  networks:
+  - name: cf
+  properties:
+    consul:
+      agent:
+        services:
+          uaa: {}
+    metron_agent:
+      zone: z1
+    route_registrar:
+      routes:
+      - health_check:
+          name: uaa-healthcheck
+          script_path: /var/vcap/jobs/uaa/bin/health_check
+        name: uaa
+        port: 8080
+        registration_interval: 4s
+        tags:
+          component: uaa
+        uris:
+        - uaa.system.10.4.1.80.xip.io
+        - '*.uaa.system.10.4.1.80.xip.io'
+        - login.system.10.4.1.80.xip.io
+        - '*.login.system.10.4.1.80.xip.io'
+    uaa:
+      proxy:
+        servers:
+        - 10.244.0.22
+  resource_pool: warden
+  templates:
+  - name: uaa
+    release: cf
+  - name: metron_agent
+    release: cf
+  - name: consul_agent
+    release: cf
+  - name: route_registrar
+    release: cf
+  - name: statsd-injector
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+  update: {}
+- instances: 1
+  name: api_z1
+  networks:
+  - name: cf
+  properties:
+    consul:
+      agent:
+        services:
+          cloud_controller_ng: {}
+    metron_agent:
+      zone: z1
+    nfs_server: null
+    route_registrar:
+      routes:
+      - name: api
+        port: 9022
+        registration_interval: 20s
+        tags:
+          component: CloudController
+        uris:
+        - api.system.10.4.1.80.xip.io
+  resource_pool: warden
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: java-buildpack
+    release: cf
+  - name: java-offline-buildpack
+    release: cf
+  - name: go-buildpack
+    release: cf
+  - name: binary-buildpack
+    release: cf
+  - name: nodejs-buildpack
+    release: cf
+  - name: ruby-buildpack
+    release: cf
+  - name: php-buildpack
+    release: cf
+  - name: python-buildpack
+    release: cf
+  - name: staticfile-buildpack
+    release: cf
+  - name: cloud_controller_ng
+    release: cf
+  - name: metron_agent
+    release: cf
+  - name: statsd-injector
+    release: cf
+  - name: route_registrar
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+  update: {}
+- instances: 1
+  name: clock_global
+  networks:
+  - name: cf
+  properties:
+    metron_agent:
+      zone: z1
+  resource_pool: warden
+  templates:
+  - name: cloud_controller_clock
+    release: cf
+  - name: metron_agent
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+  update: {}
+- instances: 1
+  name: api_worker_z1
+  networks:
+  - name: cf
+  properties:
+    metron_agent:
+      zone: z1
+    nfs_server: null
+  resource_pool: warden
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: cloud_controller_worker
+    release: cf
+  - name: metron_agent
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+  update: {}
+- instances: 1
+  name: hm9000_z1
+  networks:
+  - name: cf
+  properties:
+    consul:
+      agent:
+        services:
+          hm9000: {}
+    metron_agent:
+      zone: z1
+    route_registrar:
+      routes:
+      - name: hm9000
+        port: 5155
+        registration_interval: 20s
+        tags:
+          component: HM9K
+        uris:
+        - hm9000.system.10.4.1.80.xip.io
+  resource_pool: warden
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: hm9000
+    release: cf
+  - name: metron_agent
+    release: cf
+  - name: route_registrar
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+  update: {}
+- instances: 1
+  name: runner_z1
+  networks:
+  - name: cf
+    static_ips:
+    - 10.244.0.26
+  properties:
+    consul:
+      agent:
+        services:
+          dea:
+            check:
+              interval: 5m
+              name: dns_health_check
+              script: /var/vcap/jobs/dea_next/bin/dns_health_check
+              status: passing
+    dea_next:
+      zone: z1
+    metron_agent:
+      zone: z1
+  resource_pool: warden
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: dea_next
+    release: cf
+  - name: dea_logging_agent
+    release: cf
+  - name: metron_agent
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+  update:
+    max_in_flight: 1
+- instances: 1
+  name: loggregator_z1
+  networks:
+  - name: cf
+  properties:
+    doppler:
+      zone: z1
+    metron_agent:
+      zone: z1
+  resource_pool: warden
+  templates:
+  - name: doppler
+    release: cf
+  - name: syslog_drain_binder
+    release: cf
+  - name: metron_agent
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+  update: {}
+- instances: 1
+  name: doppler_z1
+  networks:
+  - name: cf
+  properties:
+    doppler:
+      zone: z1
+    metron_agent:
+      zone: z1
+  resource_pool: warden
+  templates:
+  - name: doppler
+    release: cf
+  - name: syslog_drain_binder
+    release: cf
+  - name: metron_agent
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+  update: {}
+- instances: 1
+  name: loggregator_trafficcontroller_z1
+  networks:
+  - name: cf
+  properties:
+    metron_agent:
+      zone: z1
+    route_registrar:
+      routes:
+      - name: doppler
+        port: 8081
+        registration_interval: 20s
+        uris:
+        - doppler.system.10.4.1.80.xip.io
+      - name: loggregator
+        port: 8080
+        registration_interval: 20s
+        uris:
+        - loggregator.system.10.4.1.80.xip.io
+    traffic_controller:
+      zone: z1
+  resource_pool: warden
+  templates:
+  - name: loggregator_trafficcontroller
+    release: cf
+  - name: metron_agent
+    release: cf
+  - name: route_registrar
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+  update: {}
+- instances: 1
+  name: router_z1
+  networks:
+  - name: cf
+    static_ips:
+    - 10.244.0.22
+  properties:
+    consul:
+      agent:
+        services:
+          gorouter: {}
+    metron_agent:
+      zone: z1
+  resource_pool: warden
+  templates:
+  - name: consul_agent
+    release: cf
+  - name: gorouter
+    release: cf
+  - name: metron_agent
+    release: cf
+  - name: toolbelt
+    release: toolbelt
+  - name: toolbelt-quick
+    release: toolbelt
+  update: {}
+name: bosh-lite-alpha-cf
+networks:
+- name: cf
+  subnets:
+  - gateway: 10.244.0.1
+    range: 10.244.0.0/24
+    static:
+    - 10.244.0.2 - 10.244.0.100
+properties:
+  acceptance_tests:
+    admin_password: REDACTED
+    admin_user: admin
+    api: https://api.system.10.4.1.80.xip.io
+    apps_domain: run.10.4.1.80.xip.io
+    nodes: 1
+    skip_ssl_validation: true
+    use_http: true
+  app_domains:
+  - run.10.4.1.80.xip.io
+  app_ssh:
+    host_key_fingerprint: REDACTED
+    oauth_client_id: ssh-proxy
+  blobstore:
+    admin_users:
+    - password: REDACTED
+      username: blobstore
+    port: 80
+    secure_link:
+      secret: REDACTED
+    tls:
+      ca_cert: REDACTED
+      cert: REDACTED
+      port: 443
+      private_key: REDACTED
+  cc:
+    allow_app_ssh_access: true
+    allowed_cors_domains: []
+    app_events:
+      cutoff_age_in_days: 31
+    app_usage_events:
+      cutoff_age_in_days: 31
+    audit_events:
+      cutoff_age_in_days: 31
+    broker_client_default_async_poll_interval_seconds: null
+    broker_client_max_async_poll_duration_minutes: null
+    broker_client_timeout_seconds: 70
+    buildpacks:
+      blobstore_type: webdav
+      buildpack_directory_key: 10.4.1.80.xip.io-cc-buildpacks
+      cdn: null
+      fog_connection: null
+      webdav_config:
+        ca_cert: REDACTED
+        password: REDACTED
+        private_endpoint: https://blobstore.service.cf.internal
+        public_endpoint: http://blobstore.system.10.4.1.80.xip.io
+        username: blobstore
+    bulk_api_password: REDACTED
+    client_max_body_size: 15M
+    db_encryption_key: REDACTED
+    db_logging_level: debug2
+    dea_use_https: true
+    default_app_disk_in_mb: 1024
+    default_app_memory: 256
+    default_buildpacks:
+    - name: staticfile_buildpack
+      package: staticfile-buildpack
+    - name: java_buildpack
+      package: buildpack_java
+    - name: ruby_buildpack
+      package: ruby-buildpack
+    - name: nodejs_buildpack
+      package: nodejs-buildpack
+    - name: go_buildpack
+      package: go-buildpack
+    - name: python_buildpack
+      package: python-buildpack
+    - name: php_buildpack
+      package: php-buildpack
+    - name: binary_buildpack
+      package: binary-buildpack
+    default_health_check_timeout: 60
+    default_quota_definition: default
+    default_running_security_groups:
+    - public_networks
+    - dns
+    - services
+    - load_balancer
+    - user_bosh_deployments
+    default_staging_security_groups:
+    - public_networks
+    - dns
+    - services
+    - load_balancer
+    - user_bosh_deployments
+    default_to_diego_backend: false
+    development_mode: false
+    directories: null
+    disable_custom_buildpacks: false
+    droplets:
+      blobstore_type: webdav
+      cdn: null
+      droplet_directory_key: 10.4.1.80.xip.io-cc-droplets
+      fog_connection: null
+      max_staged_droplets_stored: null
+      webdav_config:
+        ca_cert: REDACTED
+        password: REDACTED
+        private_endpoint: https://blobstore.service.cf.internal
+        public_endpoint: http://blobstore.system.10.4.1.80.xip.io
+        username: blobstore
+    external_host: api
+    external_port: 9022
+    external_protocol: null
+    install_buildpacks:
+    - name: staticfile_buildpack
+      package: staticfile-buildpack
+    - name: java_buildpack
+      package: buildpack_java
+    - name: ruby_buildpack
+      package: ruby-buildpack
+    - name: nodejs_buildpack
+      package: nodejs-buildpack
+    - name: go_buildpack
+      package: go-buildpack
+    - name: python_buildpack
+      package: python-buildpack
+    - name: php_buildpack
+      package: php-buildpack
+    - name: binary_buildpack
+      package: binary-buildpack
+    internal_api_password: REDACTED
+    internal_api_user: internal_api_user
+    jobs:
+      app_bits_packer:
+        timeout_in_seconds: null
+      app_events_cleanup:
+        timeout_in_seconds: null
+      app_usage_events_cleanup:
+        timeout_in_seconds: null
+      blobstore_delete:
+        timeout_in_seconds: null
+      blobstore_upload:
+        timeout_in_seconds: null
+      droplet_deletion:
+        timeout_in_seconds: null
+      droplet_upload:
+        timeout_in_seconds: null
+      generic:
+        number_of_workers: null
+      global:
+        timeout_in_seconds: 14400
+    logging_level: debug2
+    maximum_app_disk_in_mb: 2048
+    maximum_health_check_timeout: 180
+    min_cli_version: null
+    min_recommended_cli_version: null
+    packages:
+      app_package_directory_key: 10.4.1.80.xip.io-cc-packages
+      blobstore_type: webdav
+      cdn: null
+      fog_connection: null
+      max_package_size: 1073741824
+      max_valid_packages_stored: null
+      webdav_config:
+        ca_cert: REDACTED
+        password: REDACTED
+        private_endpoint: https://blobstore.service.cf.internal
+        public_endpoint: http://blobstore.system.10.4.1.80.xip.io
+        username: blobstore
+    quota_definitions:
+      default:
+        memory_limit: 10240
+        non_basic_services_allowed: true
+        total_routes: 1000
+        total_service_keys: 1000
+        total_services: 100
+    reserved_private_domains: null
+    resource_pool:
+      blobstore_type: webdav
+      cdn: null
+      fog_connection: null
+      resource_directory_key: 10.4.1.80.xip.io-cc-resources
+      webdav_config:
+        ca_cert: REDACTED
+        password: REDACTED
+        private_endpoint: https://blobstore.service.cf.internal
+        public_endpoint: http://blobstore.system.10.4.1.80.xip.io
+        username: blobstore
+    security_event_logging:
+      enabled: null
+    security_group_definitions:
+    - name: public_networks
+      rules:
+      - destination: 0.0.0.0-9.255.255.255
+        protocol: all
+      - destination: 11.0.0.0-169.253.255.255
+        protocol: all
+      - destination: 169.255.0.0-172.15.255.255
+        protocol: all
+      - destination: 172.32.0.0-192.167.255.255
+        protocol: all
+      - destination: 192.169.0.0-255.255.255.255
+        protocol: all
+    - name: dns
+      rules:
+      - destination: 0.0.0.0/0
+        ports: "53"
+        protocol: tcp
+      - destination: 0.0.0.0/0
+        ports: "53"
+        protocol: udp
+    - name: services
+      rules:
+      - destination: 10.244.0.0 - 10.244.1.255
+        protocol: all
+    - name: load_balancer
+      rules:
+      - destination: 10.244.0.34
+        protocol: all
+    - name: user_bosh_deployments
+      rules:
+      - destination: 10.244.0.0 - 10.244.255.255
+        protocol: all
+    service_usage_events:
+      cutoff_age_in_days: 31
+    srv_api_uri: https://api.system.10.4.1.80.xip.io
+    stacks: null
+    staging_upload_password: REDACTED
+    staging_upload_user: staging_upload_user
+    system_buildpacks:
+    - name: staticfile_buildpack
+      package: staticfile-buildpack
+    - name: java_buildpack
+      package: buildpack_java
+    - name: ruby_buildpack
+      package: ruby-buildpack
+    - name: nodejs_buildpack
+      package: nodejs-buildpack
+    - name: go_buildpack
+      package: go-buildpack
+    - name: python_buildpack
+      package: python-buildpack
+    - name: php_buildpack
+      package: php-buildpack
+    - name: binary_buildpack
+      package: binary-buildpack
+    system_hostnames: null
+    thresholds:
+      api:
+        alert_if_above_mb: null
+        restart_if_above_mb: null
+        restart_if_consistently_above_mb: null
+      worker:
+        alert_if_above_mb: null
+        restart_if_above_mb: null
+        restart_if_consistently_above_mb: null
+    user_buildpacks: []
+    users_can_select_backend: true
+    volume_services_enabled: true
+    webdav_config:
+      ca_cert: REDACTED
+      password: REDACTED
+      private_endpoint: https://blobstore.service.cf.internal
+      public_endpoint: http://blobstore.system.10.4.1.80.xip.io
+      username: blobstore
+  ccdb:
+    address: 10.244.0.30
+    databases:
+    - citext: true
+      name: ccdb
+      tag: cc
+    db_scheme: postgres
+    port: 5432
+    roles:
+    - name: ccadmin
+      password: REDACTED
+      tag: admin
+  collector: null
+  consul:
+    agent:
+      domain: cf.internal
+      log_level: null
+      servers:
+        lan:
+        - 10.244.0.54
+    agent_cert: REDACTED
+    agent_key: REDACTED
+    ca_cert: REDACTED
+    encrypt_keys:
+    - REDACTED
+    server_cert: REDACTED
+    server_key: REDACTED
+  dea_next:
+    advertise_interval_in_seconds: 5
+    allow_host_access: null
+    allow_networks: []
+    ca_cert: REDACTED
+    client_cert: REDACTED
+    client_key: REDACTED
+    default_health_check_timeout: 60
+    deny_networks: []
+    directory_server_protocol: https
+    disk_mb: 32768
+    disk_overcommit_factor: 3
+    enable_ssl: true
+    evacuation_bail_out_time_in_seconds: 0
+    heartbeat_interval_in_seconds: 10
+    instance_bandwidth_limit: null
+    instance_disk_inode_limit: 200000
+    kernel_network_tuning_enabled: false
+    logging_level: debug
+    memory_mb: 8192
+    memory_overcommit_factor: null
+    mtu: null
+    post_setup_hook: null
+    rlimit_core: 0
+    server_cert: REDACTED
+    server_key: REDACTED
+    staging_bandwidth_limit: null
+    staging_disk_inode_limit: 200000
+    staging_disk_limit_mb: 6144
+    staging_memory_limit_mb: 1024
+  description: null
+  disk_quota_enabled: false
+  domain: 10.4.1.80.xip.io
+  doppler:
+    blacklisted_syslog_ranges: null
+    debug: false
+    maxRetainedLogMessages: 100
+    message_drain_buffer_size: null
+    port: 443
+    tls:
+      enable: null
+      port: null
+      server_cert: null
+      server_key: null
+    unmarshaller_count: 5
+    zone: null
+  doppler_endpoint:
+    shared_secret: REDACTED
+  dropsonde:
+    enabled: true
+  etcd:
+    advertise_urls_dns_suffix: etcd.service.cf.internal
+    machines:
+    - 10.244.0.42
+    peer_require_ssl: false
+    require_ssl: false
+  etcd_metrics_server:
+    nats:
+      machines:
+      - 10.244.0.6
+      password: REDACTED
+      username: nats_user
+  ha_proxy: null
+  hm9000:
+    ca_cert: REDACTED
+    client_cert: REDACTED
+    client_key: REDACTED
+    port: 5155
+    server_cert: REDACTED
+    server_key: REDACTED
+    url: https://hm9000.system.10.4.1.80.xip.io
+  logger_endpoint:
+    port: 443
+  loggregator:
+    blacklisted_syslog_ranges: null
+    debug: false
+    etcd:
+      machines:
+      - 10.244.0.42
+    maxRetainedLogMessages: 100
+    outgoing_dropsonde_port: 8081
+    tls:
+      ca_cert: null
+  loggregator_endpoint:
+    shared_secret: REDACTED
+  login:
+    analytics:
+      code: null
+      domain: null
+    asset_base_url: null
+    brand: oss
+    catalina_opts: null
+    enabled: true
+    invitations_enabled: null
+    links:
+      passwd: https://console.system.10.4.1.80.xip.io/password_resets/new
+      signup: https://console.system.10.4.1.80.xip.io/register
+    logout: null
+    messages: null
+    notifications:
+      url: null
+    protocol: null
+    restricted_ips_regex: null
+    saml: null
+    self_service_links_enabled: null
+    signups_enabled: null
+    smtp:
+      host: null
+      password: null
+      port: null
+      user: null
+    spring_profiles: null
+    tiles: null
+    uaa_base: null
+    url: null
+  metron_agent:
+    buffer_size: null
+    deployment: bosh-lite-alpha-cf
+    enable_buffer: null
+    preferred_protocol: null
+    tls:
+      client_cert: null
+      client_key: null
+  metron_endpoint:
+    shared_secret: REDACTED
+  nats:
+    debug: false
+    machines:
+    - 10.244.0.6
+    monitor_port: 4221
+    password: REDACTED
+    port: 4222
+    prof_port: 0
+    trace: false
+    user: nats_user
+  nfs_server: null
+  pgpool:
+    databases:
+    - extensions:
+      - citext
+      - pgcrypto
+      name: ccdb
+      users:
+      - ccadmin
+    - extensions:
+      - citext
+      - pgcrypto
+      name: uaadb
+      users:
+      - uaaadmin
+    users:
+    - password: REDACTED
+      username: uaaadmin
+    - password: REDACTED
+      username: ccadmin
+  postgres:
+    config:
+      listen_addresses: '*'
+      port: 5432
+    hba:
+    - host all all 0.0.0.0/0 md5
+    - host all all ::/0 md5
+    replication:
+      enabled: false
+  request_timeout_in_seconds: 900
+  router:
+    cipher_suites: null
+    debug_addr: null
+    drain_wait: null
+    enable_access_log_streaming: null
+    enable_ssl: null
+    extra_headers_to_log: null
+    logrotate: null
+    port: null
+    requested_route_registration_interval_in_seconds: null
+    route_services_recommend_https: false
+    route_services_secret: REDACTED
+    route_services_secret_decrypt_only: null
+    route_services_timeout: null
+    secure_cookies: null
+    skip_oauth_tls_verification: true
+    ssl_cert: null
+    ssl_key: null
+    ssl_skip_validation: true
+    status:
+      password: REDACTED
+      port: null
+      user: health
+  routing_api:
+    enabled: null
+  smoke_tests:
+    api: https://api.system.10.4.1.80.xip.io
+    apps_domain: run.10.4.1.80.xip.io
+    ginkgo_opts: null
+    org: SMOKE_TEST_ORG
+    password: REDACTED
+    skip_ssl_validation: true
+    space: SMOKE_TEST_SPACE
+    user: admin
+  ssl:
+    skip_cert_verify: true
+  support_address: http://support.cloudfoundry.com
+  syslog_daemon_config: null
+  system_domain: system.10.4.1.80.xip.io
+  system_domain_organization: system
+  traffic_controller:
+    disable_access_control: null
+    outgoing_port: 8080
+    security_event_logging:
+      enabled: false
+    zone: null
+  uaa:
+    admin:
+      client_secret: REDACTED
+    authentication:
+      policy:
+        countFailuresWithinSeconds: null
+        lockoutAfterFailures: null
+        lockoutPeriodSeconds: null
+    catalina_opts: -Xmx192m -XX:MaxPermSize=128m
+    cc:
+      client_secret: REDACTED
+    clients:
+      cc-service-dashboards:
+        authorities: clients.read,clients.write,clients.admin
+        authorized-grant-types: client_credentials
+        scope: openid,cloud_controller_service_permissions.read
+        secret: REDACTED
+      cc_routing:
+        authorities: routing.router_groups.read
+        authorized-grant-types: client_credentials
+        secret: REDACTED
+      cf:
+        access-token-validity: 600
+        authorities: uaa.none
+        authorized-grant-types: password,refresh_token
+        override: true
+        refresh-token-validity: 2592000
+        scope: cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,scim.read,scim.write,doppler.firehose,uaa.user,routing.router_groups.read
+      cloud_controller_username_lookup:
+        authorities: scim.userids
+        authorized-grant-types: client_credentials
+        secret: REDACTED
+      doppler:
+        authorities: uaa.resource
+        override: true
+        secret: REDACTED
+      gorouter:
+        authorities: routing.routes.read
+        authorized-grant-types: client_credentials,refresh_token
+        secret: REDACTED
+      login:
+        authorities: oauth.login,scim.write,clients.read,notifications.write,critical_notifications.write,emails.write,scim.userids,password.write
+        authorized-grant-types: authorization_code,client_credentials,refresh_token
+        autoapprove: true
+        override: true
+        redirect-uri: https://login.system.10.4.1.80.xip.io
+        scope: openid,oauth.approvals
+        secret: REDACTED
+      notifications:
+        authorities: cloud_controller.admin,scim.read
+        authorized-grant-types: client_credentials
+        secret: REDACTED
+      ssh-proxy:
+        authorized-grant-types: authorization_code
+        autoapprove: true
+        override: true
+        redirect-uri: /login
+        scope: openid,cloud_controller.read,cloud_controller.write,cloud_controller.admin
+        secret: REDACTED
+      tcp_emitter:
+        authorities: routing.routes.write,routing.routes.read,routing.router_groups.read
+        authorized-grant-types: client_credentials,refresh_token
+        secret: REDACTED
+      tcp_router:
+        authorities: routing.routes.read,routing.router_groups.read
+        authorized-grant-types: client_credentials,refresh_token
+        secret: REDACTED
+    database: null
+    issuer: https://uaa.system.10.4.1.80.xip.io
+    jwt:
+      signing_key: REDACTED
+      verification_key: REDACTED
+    ldap: null
+    login: null
+    newrelic: null
+    no_ssl: null
+    port: 8080
+    require_https: true
+    restricted_ips_regex: 10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.1[6-9]{1}\.\d{1,3}\.\d{1,3}|172\.2[0-9]{1}\.\d{1,3}\.\d{1,3}|172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}
+    scim:
+      external_groups: null
+      groups: null
+      userids_enabled: true
+      users:
+      - admin|REDACTED|scim.write,scim.read,openid,cloud_controller.admin,clients.read,clients.write,doppler.firehose,routing.router_groups.read
+    spring_profiles: null
+    ssl:
+      port: 8443
+    sslCertificate: REDACTED
+    sslPrivateKey: REDACTED
+    url: https://uaa.system.10.4.1.80.xip.io
+    user: null
+    zones:
+      internal:
+        hostnames:
+        - uaa.service.cf.internal
+  uaadb:
+    address: 10.244.0.30
+    databases:
+    - citext: true
+      name: uaadb
+      tag: uaa
+    db_scheme: postgresql
+    port: 5432
+    roles:
+    - name: uaaadmin
+      password: REDACTED
+      tag: admin
+releases:
+- name: cf
+  sha1: 8996122278b03b6ba21ec673812d2075c37f1097
+  url: https://bosh.io/d/github.com/cloudfoundry/cf-release?v=237
+  version: 237
+- name: toolbelt
+  sha1: 0ff09164d76223823cd30bd5592fcc6c58a2c28f
+  url: https://bosh.io/d/github.com/cloudfoundry-community/toolbelt-boshrelease?v=3.2.10
+  version: 3.2.10
+- name: postgres
+  sha1: f3f0282266b492a3e72a94c745caec1a6a41bf46
+  url: https://github.com/cloudfoundry-community/postgres-boshrelease/releases/download/v1.0.3/postgres-1.0.3.tgz
+  version: 1.0.3
+resource_pools:
+- cloud_properties: {}
+  name: warden
+  network: cf
+  stemcell:
+    name: bosh-warden-boshlite-ubuntu-trusty-go_agent
+    sha1: 7c1c34df689772c7b14ce85322c4c044fafe7dbe
+    url: https://bosh.io/d/stemcells/bosh-warden-boshlite-ubuntu-trusty-go_agent?v=3262.2
+    version: track
+update:
+  canaries: 1
+  canary_watch_time: 1000-180000
+  max_in_flight: 50
+  serial: false
+  update_watch_time: 1000-180000
+
